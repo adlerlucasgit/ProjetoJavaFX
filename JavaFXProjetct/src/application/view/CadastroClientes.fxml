@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.view.CadastroClientesController">
+   <children>
+      <AnchorPane fx:id="ap" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
+         <children>
+            <MenuBar layoutY="4.0" prefHeight="0.0" prefWidth="600.0">
+               <menus>
+                  <Menu mnemonicParsing="false" text="Início">
+                     <items>
+                        <MenuItem fx:id="itemSair" mnemonicParsing="false" onAction="#Sair" text="Sair" />
+                        <MenuItem fx:id="Voltar" mnemonicParsing="false" onAction="#Voltar" text="Voltar para o início" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Cadastros">
+                     <items>
+                        <MenuItem fx:id="Produtos" mnemonicParsing="false" onAction="#CadastroProduto" text="Produtos" />
+                        <MenuItem fx:id="Clientes" mnemonicParsing="false" onAction="#CadastroCliente" text="Clientes" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Operações">
+                     <items>
+                        <MenuItem fx:id="ProcessarEstoque" mnemonicParsing="false" text="Processar estoque" />
+                     </items>
+                  </Menu>
+               </menus>
+            </MenuBar>
+            <Label layoutX="218.0" layoutY="50.0" text="Cadastro de Clientes">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <TextField fx:id="txtNome" layoutX="69.0" layoutY="104.0" promptText="Nome" />
+            <TextField fx:id="txtNome1" layoutX="69.0" layoutY="143.0" promptText="Nome" />
+         </children>
+      </AnchorPane>
+   </children>
+</StackPane>

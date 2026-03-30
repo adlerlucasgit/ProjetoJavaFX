@@ -66,4 +66,9 @@ public class SistemaController {
 	public void CadastroCliente() {
 		carregarTela("CadastroClientes.fxml");
 	}
+	
+	@FXML
+	public void ProcessarEstoque() {
+		carregarTela("ProcessarEstoque.fxml");
+	}
 }

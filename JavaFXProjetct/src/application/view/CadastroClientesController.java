@@ -44,4 +44,9 @@ public class CadastroClientesController extends SistemaController{
 	public void Voltar() {
 		carregarTela("Sistema.fxml");
 	}
+	
+	@FXML
+	public void ProcessarEstoque() {
+		carregarTela("ProcessarEstoque.fxml");
+	}
 }

@@ -29,7 +29,7 @@
                   </Menu>
                   <Menu mnemonicParsing="false" text="Operações">
                      <items>
-                        <MenuItem fx:id="ProcessarEstoque" mnemonicParsing="false" text="Processar estoque" />
+                        <MenuItem fx:id="ProcessarEstoque" mnemonicParsing="false" onAction="#ProcessarEstoque" text="Processar estoque" />
                      </items>
                   </Menu>
                </menus>

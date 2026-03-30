@@ -83,6 +83,12 @@ public class CadastroProdutosController extends SistemaController {
     public void Voltar() {
         carregarTela("Sistema.fxml");
     }
+    
+	@FXML
+	public void ProcessarEstoque() {
+		carregarTela("ProcessarEstoque.fxml");
+	}
+    
 	ProdutoModel produto = new ProdutoModel(0,null, null, null, 0, 0, null);
 
 	public String FormatarID(int id) {

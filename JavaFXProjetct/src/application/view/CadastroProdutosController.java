@@ -1,5 +1,9 @@
 package application.view;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+
 import application.model.ProdutoModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -34,6 +38,9 @@ public class CadastroProdutosController extends SistemaController {
 
     @FXML
     private TextField txtQuantidade;
+    
+    @FXML 
+    private TextField txtCodigoBarras;
 
     @FXML
     private AnchorPane ap;
@@ -52,6 +59,7 @@ public class CadastroProdutosController extends SistemaController {
     @FXML private TableColumn<ProdutoModel, Integer> colId;
     @FXML private TableColumn<ProdutoModel, String> colNome;
     @FXML private TableColumn<ProdutoModel, String> colDescricao;
+    @FXML private TableColumn<ProdutoModel, String> colCodigoBarras;
     @FXML private TableColumn<ProdutoModel, String> colCategoria;
     @FXML private TableColumn<ProdutoModel, Integer> colQuantidade;
     @FXML private TableColumn<ProdutoModel, Double> colPreco;
@@ -75,24 +83,35 @@ public class CadastroProdutosController extends SistemaController {
     public void Voltar() {
         carregarTela("Sistema.fxml");
     }
-	ProdutoModel produto = new ProdutoModel(0,null, null, null, 0, 0);
+	ProdutoModel produto = new ProdutoModel(0,null, null, null, 0, 0, null);
 
+	public String FormatarID(int id) {
+	    return String.format("%06d", id);
+	}
+	
+	public String FormatarPreco(double preco) {
+		// Configura o formato brasileiro com vírgula
+		DecimalFormatSymbols simbolos = new DecimalFormatSymbols(new Locale("pt", "BR"));
+		simbolos.setDecimalSeparator(',');
+		DecimalFormat formato = new DecimalFormat("#0.00", simbolos); // 2 casas decimais
+
+		// Converte para string com vírgula
+		String precoFormatado = formato.format(preco);
+		
+		return precoFormatado;
+	}
+	
     @FXML
     public void Cadastrar() {
     	String erros = "";
     	if(txtNome.getText().isEmpty()) {
     		erros+="\nO campo Nome está em branco";
     	}
-    	if(txtQuantidade.getText().isEmpty()) {
-    		erros+="\nO campo Quantidade está em branco";
-    	}
     	if(txtPreco.getText().isEmpty()) {
     		erros+="\nO campo Preço está em branco";
     	}
     	
-        if (txtNome.getText().isEmpty() ||
-            txtQuantidade.getText().isEmpty() ||
-            txtPreco.getText().isEmpty()) {
+        if (txtNome.getText().isEmpty() || txtPreco.getText().isEmpty()) {
 
             Alert aviso = new Alert(Alert.AlertType.ERROR);
             aviso.setTitle("Erro");
@@ -103,7 +122,7 @@ public class CadastroProdutosController extends SistemaController {
         }
 
         try {
-            int quantidade = Integer.parseInt(txtQuantidade.getText());
+            int quantidade = 0;
             double preco = Double.parseDouble(txtPreco.getText());
 
             ProdutoModel produto = new ProdutoModel(
@@ -112,7 +131,8 @@ public class CadastroProdutosController extends SistemaController {
                     txtDescricao.getText(),
                     txtCategoria.getText(),
                     quantidade,
-                    preco
+                    preco,
+                    txtCodigoBarras.getText()
                 );
             
             boolean salvo = produto.Salvar();
@@ -138,7 +158,7 @@ public class CadastroProdutosController extends SistemaController {
             Alert erro = new Alert(Alert.AlertType.ERROR);
             erro.setTitle("Erro");
             erro.setHeaderText(null);
-            erro.setContentText("Quantidade e preço devem ser números válidos!");
+            erro.setContentText("Preço deve ser números válidos!");
             erro.showAndWait();
         }
     }
@@ -158,6 +178,8 @@ public class CadastroProdutosController extends SistemaController {
             produtoSelecionado.setCategoria(txtCategoria.getText());
             produtoSelecionado.setQuantidade(Integer.parseInt(txtQuantidade.getText()));
             produtoSelecionado.setPreco(Double.parseDouble(txtPreco.getText()));
+            produtoSelecionado.setCodigoBarras(txtCodigoBarras.getText());
+
 
             // Chama o método do modelo
             produtoSelecionado.Editar();
@@ -174,16 +196,41 @@ public class CadastroProdutosController extends SistemaController {
     
     @FXML
     public void Pesquisar() {
+    	//usa o setOnAction para buscar usando a tecla enter
+    	txtBuscar.setOnAction(event -> {
+        	if(!txtBuscar.getText().isEmpty()) {
+        		produto.Buscar(txtBuscar.getText());
+           		carregarTabela(txtBuscar.getText());
+        		
+           		txtId.setText(FormatarID(produto.getId()));
+        		txtNome.setText(produto.getNome());
+        		txtDescricao.setText(produto.getDescricao());
+        		txtCategoria.setText(produto.getCategoria());
+        		txtQuantidade.setText(String.valueOf((produto.getQuantidade())));
+        		txtPreco.setText(FormatarPreco(produto.getPreco()));
+        		
+        		produtoSelecionado = produto;
+        	} else {
+            	Alert mensagem = new Alert(Alert.AlertType.ERROR);
+            	mensagem.setContentText("Produto não encontrado!");
+            	mensagem.showAndWait();
+            	ProdutoModel.listarTodos(null);
+            	carregarTabela(null);
+            	limparCampos();
+        	}
+    	});
+    	
+    	//usa o on action do botao pesquisar
     	if(!txtBuscar.getText().isEmpty()) {
     		produto.Buscar(txtBuscar.getText());
-       		ProdutoModel.listarTodos(txtBuscar.getText());
+       		carregarTabela(txtBuscar.getText());
     		
-    		txtId.setText(String.valueOf((produto.getId())));
+       		txtId.setText(FormatarID(produto.getId()));
     		txtNome.setText(produto.getNome());
     		txtDescricao.setText(produto.getDescricao());
     		txtCategoria.setText(produto.getCategoria());
     		txtQuantidade.setText(String.valueOf((produto.getQuantidade())));
-    		txtPreco.setText(String.valueOf(produto.getPreco()));
+    		txtPreco.setText(FormatarPreco(produto.getPreco()));
     		
     		produtoSelecionado = produto;
     	} else {
@@ -219,28 +266,31 @@ public class CadastroProdutosController extends SistemaController {
         txtCategoria.clear();
         txtQuantidade.clear();
         txtPreco.clear();
+        txtCodigoBarras.clear();
     }
     
     public void initialize() {
-
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+    	
+    	colId.setCellValueFactory(new PropertyValueFactory<>("idFormatado"));
+    	colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
         colDescricao.setCellValueFactory(new PropertyValueFactory<>("descricao"));
         colCategoria.setCellValueFactory(new PropertyValueFactory<>("categoria"));
         colQuantidade.setCellValueFactory(new PropertyValueFactory<>("quantidade"));
-        colPreco.setCellValueFactory(new PropertyValueFactory<>("preco"));
+        colPreco.setCellValueFactory(new PropertyValueFactory<>("precoFormatado"));
+        colCodigoBarras.setCellValueFactory(new PropertyValueFactory<>("codigoBarras"));
 
         carregarTabela(null);
 
         tvTabelaProdutos.getSelectionModel().selectedItemProperty().addListener(
             (obs, oldValue, produto) -> {
                 if (produto != null) {
-            		txtId.setText(String.valueOf((produto.getId())));
+                	txtId.setText(FormatarID(produto.getId()));
                     txtNome.setText(produto.getNome());
                     txtDescricao.setText(produto.getDescricao());
                     txtCategoria.setText(produto.getCategoria());
                     txtQuantidade.setText(String.valueOf(produto.getQuantidade()));
                     txtPreco.setText(String.valueOf(produto.getPreco()));
+            		txtCodigoBarras.setText(produto.getCodigoBarras());
 
                     produtoSelecionado = produto;
                 }
@@ -248,11 +298,12 @@ public class CadastroProdutosController extends SistemaController {
         );
     }
     
-	public void carregarTabela(String valor) {
-	    ObservableList<ProdutoModel> lista = FXCollections.observableArrayList(ProdutoModel.listarTodos(valor));
-	    tvTabelaProdutos=(TableView<ProdutoModel>) FXCollections.observableArrayList(produtoSelecionado);
-	    tvTabelaProdutos.setItems(lista);
-	}
+    public void carregarTabela(String valor) {
+        ObservableList<ProdutoModel> lista =
+                FXCollections.observableArrayList(ProdutoModel.listarTodos(valor));
+
+        tvTabelaProdutos.setItems(lista);
+    }
     
     
 }

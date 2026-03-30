@@ -4,8 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import application.Conexao;
 import javafx.scene.control.Alert;
@@ -18,18 +21,24 @@ public class ProdutoModel {
 	private String categoria;
 	private int quantidade;
 	private double preco;
+	private String codigoBarras;
 
-	public ProdutoModel(int id, String nome, String descricao, String categoria, int quantidade, double preco) {
+	public ProdutoModel(int id, String nome, String descricao, String categoria, int quantidade, double preco, String codigoBarras) {
 		this.id = id;
 		this.nome = nome;
 		this.descricao = descricao;
 		this.categoria = categoria;
 		this.quantidade = quantidade;
 		this.preco = preco;
+		this.codigoBarras = codigoBarras;
 	}
 
 	public int getId() {
 		return id;
+	}
+	
+	public String getIdFormatado() {
+	    return String.format("%06d", this.id);
 	}
 
 	public void setId(int id) {
@@ -71,13 +80,30 @@ public class ProdutoModel {
 	public double getPreco() {
 		return preco;
 	}
+	
+	public String getCodigoBarras() {
+		return codigoBarras;
+	}
+	
+	public void setCodigoBarras(String codigoBarras) {
+		this.codigoBarras = codigoBarras;
+	}
+	
+	public String getPrecoFormatado() {
+	    // Configura o formato brasileiro com vírgula
+	    DecimalFormatSymbols simbolos = new DecimalFormatSymbols(new Locale("pt", "BR"));
+	    simbolos.setDecimalSeparator(',');
+	    DecimalFormat formato = new DecimalFormat("#0.00", simbolos); // 2 casas decimais
+
+	    return formato.format(this.preco);
+	}
 
 	public void setPreco(double preco) {
 		this.preco = preco;
 	}
 
 	public boolean Salvar() {
-		String sql = "INSERT INTO produto(nome, descricao, categoria, quantidade, preco) VALUES(?,?,?,?,?)";
+		String sql = "INSERT INTO produto(nome, descricao, categoria, quantidade, preco, codigoBarras) VALUES(?,?,?,?,?,?)";
 
 		try (Connection conn = Conexao.getConnection(); PreparedStatement consulta = conn.prepareStatement(sql)) {
 
@@ -86,6 +112,7 @@ public class ProdutoModel {
 			consulta.setString(3, categoria);
 			consulta.setInt(4, quantidade);
 			consulta.setDouble(5, preco);
+			consulta.setString(6, codigoBarras);
 
 			int linhas = consulta.executeUpdate();
 
@@ -100,14 +127,15 @@ public class ProdutoModel {
 	public void Editar() {
 		try (Connection conn = Conexao.getConnection();
 				PreparedStatement consulta = conn.prepareStatement(
-						"UPDATE produto SET nome =?, descricao=?, categoria=?, quantidade=?, preco=? WHERE id = ?")) {
+						"UPDATE produto SET nome =?, descricao=?, categoria=?, quantidade=?, preco=? , codigoBarras=? WHERE id = ?")) {
 
 			consulta.setString(1, this.nome);
 			consulta.setString(2, this.descricao);
 			consulta.setString(3, this.categoria);
 			consulta.setInt(4, this.quantidade);
 			consulta.setDouble(5, this.preco);
-			consulta.setInt(6, this.id);
+			consulta.setString(6, this.codigoBarras);
+			consulta.setInt(7, id);
 
 			consulta.executeUpdate();
 
@@ -135,6 +163,7 @@ public class ProdutoModel {
 				this.categoria = resultado.getString("categoria");
 				this.quantidade = resultado.getInt("quantidade");
 				this.preco = resultado.getDouble("preco");
+				this.codigoBarras = resultado.getString("codigoBarras");
 			} else {
 				Alert mensagem = new Alert(Alert.AlertType.ERROR);
 				mensagem.setContentText("Produto não encontrado!");
@@ -211,7 +240,7 @@ public class ProdutoModel {
 
 				ProdutoModel produto = new ProdutoModel(rs.getInt("id"), rs.getString("nome"),
 						rs.getString("descricao"), rs.getString("categoria"), rs.getInt("quantidade"),
-						rs.getDouble("preco"));
+						rs.getDouble("preco"), rs.getString("codigoBarras"));
 
 				lista.add(produto);
 			}

@@ -31,10 +31,10 @@ public class SistemaController {
 			ap.getChildren().clear();
 			ap.getChildren().add(fxml);
 			
-			ap.setTopAnchor(fxml,0.0);
-			ap.setBottomAnchor(fxml,0.0);
-			ap.setLeftAnchor(fxml,0.0);
-			ap.setRightAnchor(fxml,0.0);
+			AnchorPane.setTopAnchor(fxml,0.0);
+			AnchorPane.setBottomAnchor(fxml,0.0);
+			AnchorPane.setLeftAnchor(fxml,0.0);
+			AnchorPane.setRightAnchor(fxml,0.0);
 			Scene cena =  ap.getScene();
 			
 			if (cena!=null) {

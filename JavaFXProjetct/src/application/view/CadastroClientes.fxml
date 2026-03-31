@@ -34,9 +34,9 @@
                   </Menu>
                </menus>
             </MenuBar>
-            <Label layoutX="218.0" layoutY="50.0" text="Cadastro de Clientes">
+            <Label alignment="CENTER" layoutX="218.0" layoutY="50.0" style="-fx-background-color: gray;" text="Cadastro de Clientes" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
                <font>
-                  <Font size="18.0" />
+                  <Font name="System Bold" size="18.0" />
                </font>
             </Label>
             <TextField fx:id="txtNome" layoutX="69.0" layoutY="104.0" promptText="Nome" />

@@ -6,15 +6,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import application.Conexao;
+import application.controller.CadastroProdutosController;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
 public class ProdutoModel {
+	public static boolean encontrou;
 	private int id;
 	private String nome;
 	private String descricao;
@@ -144,7 +147,7 @@ public class ProdutoModel {
 
 		}
 	}
-
+	
 	public void Buscar(String valor) {
 		String busca = "%" + valor + "%";
 		try (Connection conn = Conexao.getConnection();
@@ -164,11 +167,12 @@ public class ProdutoModel {
 				this.quantidade = resultado.getInt("quantidade");
 				this.preco = resultado.getDouble("preco");
 				this.codigoBarras = resultado.getString("codigoBarras");
+				encontrou = true;
 			} else {
 				Alert mensagem = new Alert(Alert.AlertType.ERROR);
 				mensagem.setContentText("Produto não encontrado!");
+				encontrou = false;
 				mensagem.showAndWait();
-
 			}
 
 		} catch (SQLException e) {
@@ -251,5 +255,28 @@ public class ProdutoModel {
 
 		return lista;
 	}
+	
+    public void ProcessarEstoque(String operacao) {
+    	if(this.id>0) {
+    		String sql = "UPDATE produto SET quantidade = quantidade + ? WHERE id = ?";
+    		if(operacao.equals("Saída")) {
+    			sql = "UPDATE produto SET quantidade = quantidade - ? WHERE id = ?";    		
+    			}
+    		
+    		try(Connection conn = Conexao.getConnection();
+    				PreparedStatement consulta = conn.prepareStatement(sql);){
+    			consulta.setInt(1, this.quantidade);
+    			consulta.setInt(2, this.id);
+    			consulta.execute();
 
+    	        MovimentacaoEstoqueModel movimentacao = new MovimentacaoEstoqueModel(
+    	                0, this.id, this.nome, null, this.quantidade, operacao);
+    	        movimentacao.InsereMovimentacao();
+    			
+    		}catch(Exception e) {
+    			e.printStackTrace();
+    		}
+    	}
+    }
+    
 }

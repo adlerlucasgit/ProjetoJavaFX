@@ -1,4 +1,4 @@
-package application.view;
+package application.controller;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -202,30 +202,6 @@ public class CadastroProdutosController extends SistemaController {
     
     @FXML
     public void Pesquisar() {
-    	//usa o setOnAction para buscar usando a tecla enter
-    	txtBuscar.setOnAction(event -> {
-        	if(!txtBuscar.getText().isEmpty()) {
-        		produto.Buscar(txtBuscar.getText());
-           		carregarTabela(txtBuscar.getText());
-        		
-           		txtId.setText(FormatarID(produto.getId()));
-        		txtNome.setText(produto.getNome());
-        		txtDescricao.setText(produto.getDescricao());
-        		txtCategoria.setText(produto.getCategoria());
-        		txtQuantidade.setText(String.valueOf((produto.getQuantidade())));
-        		txtPreco.setText(FormatarPreco(produto.getPreco()));
-        		
-        		produtoSelecionado = produto;
-        	} else {
-            	Alert mensagem = new Alert(Alert.AlertType.ERROR);
-            	mensagem.setContentText("Produto não encontrado!");
-            	mensagem.showAndWait();
-            	ProdutoModel.listarTodos(null);
-            	carregarTabela(null);
-            	limparCampos();
-        	}
-    	});
-    	
     	//usa o on action do botao pesquisar
     	if(!txtBuscar.getText().isEmpty()) {
     		produto.Buscar(txtBuscar.getText());
@@ -241,12 +217,16 @@ public class CadastroProdutosController extends SistemaController {
     		produtoSelecionado = produto;
     	} else {
         	Alert mensagem = new Alert(Alert.AlertType.ERROR);
-        	mensagem.setContentText("Produto não encontrado!");
+        	mensagem.setContentText("Campo em branco!");
         	mensagem.showAndWait();
-        	ProdutoModel.listarTodos(null);
         	carregarTabela(null);
         	limparCampos();
     	}
+    	
+    	if(ProdutoModel.encontrou == false) {
+    		carregarTabela(null);
+    	}
+    	
     	
     }
     
@@ -273,6 +253,7 @@ public class CadastroProdutosController extends SistemaController {
         txtQuantidade.clear();
         txtPreco.clear();
         txtCodigoBarras.clear();
+        txtBuscar.clear();
     }
     
     public void initialize() {
@@ -295,7 +276,7 @@ public class CadastroProdutosController extends SistemaController {
                     txtDescricao.setText(produto.getDescricao());
                     txtCategoria.setText(produto.getCategoria());
                     txtQuantidade.setText(String.valueOf(produto.getQuantidade()));
-                    txtPreco.setText(String.valueOf(produto.getPreco()));
+                    txtPreco.setText(String.valueOf(FormatarPreco(produto.getPreco())));
             		txtCodigoBarras.setText(produto.getCodigoBarras());
 
                     produtoSelecionado = produto;

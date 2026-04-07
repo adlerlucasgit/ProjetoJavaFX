@@ -55,7 +55,7 @@
                 <Blend />
             </effect>
         </Button>
-        <TextField fx:id="txtBuscar" layoutX="31.0" layoutY="207.0" prefHeight="26.0" prefWidth="538.0" promptText="ID, Nome, Descrição ou Categoria do produto" />
+        <TextField fx:id="txtBuscar" layoutX="31.0" layoutY="207.0" onAction="#Pesquisar" prefHeight="26.0" prefWidth="538.0" promptText="ID, Nome, Descrição ou Categoria do produto" />
         <Button fx:id="btnBuscar" layoutX="33.0" layoutY="355.0" mnemonicParsing="false" onAction="#Pesquisar" prefHeight="30.0" prefWidth="151.0" text="Buscar">
             <effect>
                 <Blend />

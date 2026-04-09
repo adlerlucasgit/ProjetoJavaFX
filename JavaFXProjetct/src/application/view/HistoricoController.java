@@ -1,4 +1,4 @@
-package application.controller;
+package application.view;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -83,6 +83,7 @@ public class HistoricoController extends SistemaController {
 	public void initialize() {
 		
     	colID.setCellValueFactory(new PropertyValueFactory<>("idFormatado"));
+    	colIdProd.setCellValueFactory(new PropertyValueFactory<>("idFormatadoProd"));
     	colNome.setCellValueFactory(new PropertyValueFactory<>("nomeProd"));
         colQuantidade.setCellValueFactory(new PropertyValueFactory<>("quantidade"));
         colData.setCellValueFactory(new PropertyValueFactory<>("data"));
@@ -100,9 +101,14 @@ public class HistoricoController extends SistemaController {
 		List <MovimentacaoEstoqueModel> listaHistorico = movimentacao.HistoricoMovimentacao(idProd, dataInicio, dataFinal);
 		listaMovimentacao = FXCollections.observableArrayList(listaHistorico);
 		tvHistorico.setItems(listaMovimentacao);
-		lblProduto.setText(movimentacao.getNomeProd());
-		dtInicio.setValue(dataFinal);
+		lblProduto.setText("Produto: "+movimentacao.getNomeProd());
+		dtInicio.setValue(dataInicio);
 		dtFinal.setValue(dataFinal);
+	}
+	
+	public void Buscar() {
+		BuscarHistorico(movimentacao.getIdProd(), dtInicio.getValue(), dtFinal.getValue());
+		dtFinal.getValue();
 	}
 
 }

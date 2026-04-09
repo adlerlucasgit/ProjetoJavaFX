@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import application.Conexao;
-import application.controller.CadastroProdutosController;
+import application.view.CadastroProdutosController;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
@@ -277,6 +277,21 @@ public class ProdutoModel {
     			e.printStackTrace();
     		}
     	}
+    }
+    
+    public static boolean existeCodigoBarras(String codigo) {
+        String sql = "SELECT COUNT(*) FROM produto WHERE codigoBarras = ?";
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, codigo);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0; // true se já existe
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
     
 }

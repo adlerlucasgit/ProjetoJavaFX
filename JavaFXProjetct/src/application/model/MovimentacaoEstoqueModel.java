@@ -44,6 +44,10 @@ public class MovimentacaoEstoqueModel {
 		return this.idProd;
 	}
 	
+	public String getIdFormatadoProd() {
+	    return String.format("%06d", this.idProd);
+	}
+	
 	public void setIdProd(int idProd) {
 		this.idProd = idProd;
 	}
@@ -102,10 +106,10 @@ public class MovimentacaoEstoqueModel {
 	}
 	
 	public List<MovimentacaoEstoqueModel> HistoricoMovimentacao(int idProd, LocalDate dataInicio, LocalDate dataFim) {
-	    List<MovimentacaoEstoqueModel> movimentacao = new ArrayList<>();
+	    List<MovimentacaoEstoqueModel> movimentacao = new ArrayList<MovimentacaoEstoqueModel>();
 
 	    String sql = "SELECT " +
-	                 "DATE_FORMAT(m.dataHora, '%d/%m/%Y') AS data, " +
+	                 "DATE_FORMAT(m.dataHora, '%d/%m/%Y %H:%i:%s') AS data, " +
 	                 "m.id, " +
 	                 "m.idProd, " +
 	                 "p.nome, " +
@@ -118,15 +122,20 @@ public class MovimentacaoEstoqueModel {
 	                 "FROM produto p " +
 	                 "INNER JOIN movimentacaoEstoque m ON p.id = m.idProd " +
 	                 "WHERE p.id = ? " +
-	                 "AND m.dataHora BETWEEN ? AND ?";
+	                 "AND m.dataHora >= ? AND m.dataHora < ?";
 
 	    try (Connection conn = Conexao.getConnection();
 	         PreparedStatement consulta = conn.prepareStatement(sql)) {
-
-	        consulta.setInt(1, idProd);
-	        consulta.setDate(2, java.sql.Date.valueOf(dataInicio));
-	        consulta.setDate(3, java.sql.Date.valueOf(dataFim));
-
+	    	
+	    	if(idProd == 0) {
+	    		consulta.setNull(1, java.sql.Types.INTEGER);
+	    	}else {
+		        consulta.setInt(1, idProd);
+	    	}
+	    	
+	        consulta.setTimestamp(2, java.sql.Timestamp.valueOf(dataInicio.atStartOfDay()));
+	        consulta.setTimestamp(3, java.sql.Timestamp.valueOf(dataFim.plusDays(1).atStartOfDay()));
+	        
 	        ResultSet resultado = consulta.executeQuery();
 
 	        while (resultado.next()) {
@@ -137,12 +146,12 @@ public class MovimentacaoEstoqueModel {
 	                    resultado.getString("data"),
 	                    resultado.getInt("quantidade"),
 	                    resultado.getString("tipo"));
-	            this.setId(resultado.getInt("id"));
-	            this.setNomeProd(resultado.getString("nome"));
-	            this.setIdProd(resultado.getInt("idProd"));
-	            this.setTipo(resultado.getString("tipo"));
-	            this.setData(resultado.getString("data"));
-	            this.setQuantidade(resultado.getInt("quantidade"));
+	            setId(resultado.getInt("id"));
+	            setNomeProd(resultado.getString("nome"));
+	            setIdProd(resultado.getInt("idProd"));
+	            setTipo(resultado.getString("tipo"));
+	            setData(resultado.getString("data"));
+	            setQuantidade(resultado.getInt("quantidade"));
 	            movimentacao.add(m);
 	        }
 

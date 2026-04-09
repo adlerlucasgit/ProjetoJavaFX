@@ -1,4 +1,4 @@
-package application.controller;
+package application.view;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -138,7 +138,7 @@ public class CadastroProdutosController extends SistemaController {
                     txtCategoria.getText(),
                     quantidade,
                     preco,
-                    txtCodigoBarras.getText()
+                    gerarCodigoBarrasUnico()
                 );
             
             boolean salvo = produto.Salvar();
@@ -167,6 +167,22 @@ public class CadastroProdutosController extends SistemaController {
             erro.setContentText("Preço deve ser números válidos!");
             erro.showAndWait();
         }
+    }
+    
+    private String gerarCodigoBarrasUnico() {
+        String codigo = "P";
+
+        try {
+			do {
+			    // Gera 12 dígitos aleatórios
+			    codigo += String.format("%012d", (long)(Math.random() * 1_000_000_000_000L));
+			} while (ProdutoModel.existeCodigoBarras(codigo));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} // verifica duplicidade no banco
+
+        return codigo;
     }
     
     @FXML
